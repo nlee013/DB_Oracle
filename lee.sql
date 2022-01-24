@@ -2,3 +2,65 @@ select * from tab; --코드 옆에서 ctrl + ENTER 치면 data가 아래에 나옴
 --한줄주석
 /* 여러주석*/
 select * from CUSTOM;
+
+SELECT * FROM COMPANY;
+
+SELECT USERID, PAY, ROUND (PAY, -4) PAY FROM COMPANY;
+
+select * from CUSTOM;
+
+--주민번호 * 표시 만들기 :970614-2******
+SELECT RPAD(SUBSTR(JUMIN, 1, 8), 14, '*') JUMIN FROM CUSTOM;
+
+SELECT COUNT(*) INWON FROM CUSTOM WHERE JOB = '회사원';
+
+SELECT COUNT(*) INWON FROM CUSTOM WHERE ADDR1 LIKE '서울%';
+
+SELECT COUNT(*) INWON FROM CUSTOM WHERE POINT >= 200;
+
+SELECT * FROM COMPANY;--TABLE의 이름과 COLUMN의 이름이 중복되면 잘못된 것이다. 하면 안된다
+
+--대리가 받는 총금액
+SELECT COUNT(PAY) FROM COMPANY WHERE POSIT = '대리';
+--SUM: 합계
+SELECT SUM(PAY) FROM COMPANY WHERE POSIT = '대리';
+
+SELECT * FROM CUSTOM;
+
+--직업별 인원수
+SELECT JOB, COUNT(*) INWON FROM CUSTOM GROUP BY JOB;
+
+--학력별 POINT의 평균
+SELECT SCHOL, ROUND(AVG(POINT)) INWON FROM CUSTOM GROUP BY SCHOL;
+
+--지역별 POINT의 합계
+SELECT ADDR1, ROUND(SUM(POINT)) INWON FROM CUSTOM GROUP BY ADDR1;
+
+SELECT ADDR1, ROUND(SUM(POINT)) INWON, MAX(POINT)"MAX", MIN(POINT) "MIN" FROM CUSTOM GROUP BY ADDR1;
+
+
+-- 성별 나이의 평균 인원수
+SELECT SEX, ROUND(AVG(AGE)) "AVG", COUNT(*) "CNT" FROM CUSTOM GROUP BY SEX;
+
+SELECT CASE SEX WHEN '1' THEN '남자' WHEN '0' THEN '여자'
+END GENDER, ROUND(AVG(AGE)) "AVG", COUNT(*) "CNT" FROM CUSTOM GROUP BY SEX;
+/*
+SELECT 
+CASE 컬럼명                         
+	WHEN 1 THEN 100,                          
+	WHEN 2 THEN 200,                         
+	WHEN 3 THEN 300,                         
+	WHEN 4 THEN 400                          
+	ELSE 500                        
+END AS RESULT(RESULT->파생 컬럼명)            
+FROM DUAL;
+*/
+
+--하나일 때는 WHEN 1 THEN 100  ELSE 0 처럼 쓴다
+
+SELECT*FROM COMPANY;
+--직책별 전체 월급의 합계, 평균, MAX, MIN
+SELECT POSIT, COUNT(*) CNT, ROUND(AVG(PAY)) 평균, MAX(PAY) 최대,
+MIN(PAY) 최소 FROM COMPANY GROUP BY POSIT;
+
+HAVING CNT > 60 --  COUNT(*)실제 데이터를 복숩.*표시 바꿀수 없음.*칭 사용못함.
