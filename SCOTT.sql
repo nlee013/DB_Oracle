@@ -75,3 +75,108 @@ select * from emp where LENGTH(ename) >= 6 ;
 
 --9. EMP 테이블에서 모든 사원의 정보를 이름,업무,급여,보너스,급여+보너스를 출력하는 SELECT 문장을 기술하시오.
 SELECT ename, job, sal, nvl(comm, 0) as bonus, (sal+nvl(comm, 0)) as "Pay+Bonus" from emp;
+
+---------2021.01.26.수-----------------------
+--1. EMP 테이블에서 인원수,최대 급여,최소 급여,급여의 합을 계산하여 출력하는 SELECT 문장을 작성하여라.
+SELECT * FROM EMP;
+
+SELECT COUNT(*) INWON, (MAX)SAL, (MIN)SAL, SUM(SAL) FROM EMP; 
+
+--2. EMP 테이블에서 각 업무별로 최대 급여,최소 급여,급여의 합을 출력하는 SELECT 문장을 작성하여라.
+
+ SELECT MAX(SAL) "MAX", MIN(SAL) "MIN", SUM(SAL) "SUM" FROM EMP GROUP BY JOB;
+
+--3. EMP 테이블에서 업무별 인원수를 구하여 출력하는 SELECT 문장을 작성하여라.
+
+ SELECT JOB, COUNT(*) INWON FROM EMP GROUP BY JOB;
+
+--4. EMP 테이블에서 최고 급여와 최소 급여의 차이는 얼마인가 출력하는 SELECT 문장을 작성하여라.
+
+ SELECT MAX(SAL) "MAX", MIN(SAL) "MIN", MAX(SAL) - MIN(SAL) "차액" FROM EMP;
+
+--5. EMP 테이블에서 아래의 결과를 출력하는 SELECT 문장을 작성하여라.(group by)
+
+SELECT TO_CHAR(HIREDATE, 'YY') H_YEAR, COUNT(*), MIN(SAL), MAX(SAL), AVG(SAL), SUM(SAL) FROM EMP GROUP BY HIREDATE;
+--H_YEAR  COUNT(*)  MIN(SAL)  MAX(SAL)  AVG(SAL)  SUM(SAL)
+
+------ --------- --------- --------- --------- ---------
+/*
+    81       10       950      5000    2282.5	  22825
+
+    82        1      1300      1300      1300      1300
+
+    80        1       800       800       800       800
+ 
+
+5번 6번 풀 때
+ SELECT 
+CASE 컬럼명                         
+	WHEN 1 THEN 100                          
+	WHEN 2 THEN 200                         
+	WHEN 3 THEN 300                         
+	WHEN 4 THEN 400                          
+	ELSE 500                        
+END AS RESULT             
+FROM DUAL;
+
+*/
+SELECT TO_CHAR(HIREDATE, 'YY') FROM EMP;
+
+SELECT * FROM EMP;
+
+SELECT
+COUNT(*) TOTAL,
+SUM(CASE WHEN HIREDATE BETWEEN '1980/01/01' AND '1980/12/31' THEN '1' ELSE '0' END)"1980",
+SUM(CASE WHEN HIREDATE BETWEEN '1981/01/01' AND '1981/12/31' THEN '1' ELSE '0' END)"1981",
+SUM(CASE WHEN HIREDATE BETWEEN '1982/01/01' AND '1982/12/31' THEN '1' ELSE '0' END)"1982",
+SUM(CASE WHEN HIREDATE BETWEEN '1983/01/01' AND '1983/12/31' THEN '1' ELSE '0' END)"1983"
+FROM EMP;
+
+SELECT
+COUNT(*) TOTAL,
+SUM(CASE WHEN EXTRACT (YEAR FROM HIREDATE) = '1980' THEN '1' ELSE '0' END)"1980",
+SUM(CASE WHEN EXTRACT (YEAR FROM HIREDATE) = '1981' THEN '1' ELSE '0' END)"1981",
+SUM(CASE WHEN EXTRACT (YEAR FROM HIREDATE) = '1982' THEN '1' ELSE '0' END)"1982",
+SUM(CASE WHEN EXTRACT (YEAR FROM HIREDATE) = '1983' THEN '1' ELSE '0' END)"1983"
+FROM EMP;
+/*
+6. EMP 테이블에서 아래의 결과를 출력하는 SELECT 문장을 작성하여라.(case,sum, EXTRACT)
+
+    TOTAL      1980      1981      1982      1983
+
+--------- --------- --------- --------- ---------
+
+       12         1        10         1         0
+ */
+
+SELECT * FROM EMP;
+
+SELECT
+JOB "JOB",
+SUM(CASE WHEN DEPTNO = 10 THEN SAL ELSE 0 END)"DEPTHNO 10",
+SUM(CASE WHEN DEPTNO = 20 THEN SAL ELSE 0 END)"DEPTHNO 10",
+SUM(CASE WHEN DEPTNO = 30 THEN SAL ELSE 0 END)"DEPTHNO 10",
+SUM(SAL)"TOTAL"
+FROM EMP
+GROUP BY JOB;
+ 
+/*
+7. EMP 테이블에서 아래의 결과를 출력하는 SELECT 문장을 작성하여라.(case,sum)
+
+JOB         Deptno 10    Deptno 20     Deptno 30     Total
+
+---------   ---------    ---------     ---------     ---------
+
+CLERK            1300         1900           950          4150
+
+SALESMAN                                    5600          5600
+
+PRESIDENT	 5000                                     5000
+
+MANAGER	         2450         2975          2850          8275
+
+ANALYST	                      6000                        6000
+*/
+
+
+ 

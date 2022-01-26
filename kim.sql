@@ -579,4 +579,348 @@ SELECT PNAME, DNO, PAY, NVL(BONUS, -1) FROM PERSONNEL
 WHERE (PAY = 1600 AND BONUS = 500) OR (PAY = 1450 AND BONUS = 300)
 OR (PAY = 1200 AND BONUS = 0) OR (PAY = 3550 AND BONUS IS NULL);
 
+---------2021.01.26.수-----------------------------------------------
 
+--dml(data manipulation language)
+--insert데이터 삽입, update수정, delete삭제
+
+--crud
+
+SELECT * FROM division;
+desc division;--not null 반드시 값을 넣어야?
+
+INSERT into division values(50, 'operation', '031-111-2222', 'DAEGU');
+DELETE division values(50, 'operation', '031-111-2222', 'daegu');
+INSERT INTO DIVISION (DNO) VALUES(60);
+INSERT INTO DIVISON (DNAME, POSITION) VALUES ('ACCOUNT', 'DAEJUN');--실행안?
+--DNO는 NOT NULL이므로 값을 무조건 넣어야되는데 위 코드에는 안들어가서 실행안?
+
+INSERT INTO PERSONNEL (PNO, PNAME, PAY, DNO)
+VALUES (7711, 'YOUNG', 4000, 20);
+
+SELECT*FROM PERSONNEL;
+DESC PERSONNEL;
+--ERROR: UNIQUE CONSTRAINTS ->똑같은 값이 (이미)들어가있다 라는 오류 
+--암시적
+
+--명시적
+
+INSERT INTO DIVISION VALUES (70, 'PLANNING', '010-5777-7890', NULL);
+INSERT INTO DIVISION VALUES (70, 'PLANNING', '010-5777-7890', '');
+
+SELECT * FROM DIVISION;
+UPDATE DIVISION SET DNAME = 'OPERATION', POSITION = 'DAEGU' WHERE DNO = 50;
+
+
+INSERT INTO PERSONNEL (PNO, PNAME, JOB, STARTDATE, DNO)
+VALUES (1300, 'CHO', 'SALESMAN', SYSDATE, 10);
+
+SELECT*FROM PERSONNEL;
+
+SELECT STARTDATE, TO_CHAR(STARTDATE, 'YYYY-MM-DD') NALJJA FROM PERSONNEL;
+
+---치환변수---오라클에만.
+SELECT PNO, PNAME, JOB, STARTDATE, DNO
+FROM PERSONNEL
+WHERE DNO = 30;--끝에 있는 값을 변수로 바꿀 수 있음
+
+SELECT PNO, PNAME, JOB, STARTDATE, DNO
+FROM PERSONNEL
+WHERE DNO =& DIV_DNO;--&을 써줘야 치환변수다.
+--현재 위 코드는 여기서 실행안되어서 일반 CMD 창 열기
+/*
+CREATE TABLE MANAGER --매니저 테이블 만들어라
+AS 					 --어떻게?
+	SELECT * FROM PERSONNEL-- 퍼스널에서 가져온 형태로 테이블 만들어라
+	WHERE 1=2; --1=2는 거짓 조건이므로 데이터를 안가져오고 테이블
+				 형태만 복사되어서 만들어짐
+*/
+SELECT * FROM MANAGER;
+DESC MANAGER;
+
+SELECT * FROM SALESMAN;
+SELECT * FROM BUSEO;
+--아직은 SAVE 작업을 워드를 안해서 원래 데이터만 복사해서
+--내가 수정한 테이블로 나오지 않고 원본 테이블 형식 나옴
+
+SELECT * FROM DIVISION;
+
+COMMIT;--SAVE
+
+SELECT * FROM SAWON;
+
+SELECT * FROM TAB;
+
+--SUB-QUERY
+SELECT * FROM MANAGER;
+DESC MANAGER;
+
+SELECT * FROM PERSONNEL WHERE JOB = 'MANAGER';
+
+--SELECT한 결과를 특정 데이터에 집어넣는 것
+INSERT INTO MANAGER(PNO, PNAME, PAY, STARTDATE)
+SELECT PNO, PNAME, PAY, STARTDATE FROM PERSONNEL
+WHERE JOB = 'MANAGER';
+
+SELECT * FROM MANAGER;
+
+
+--업무가 SALEMAN인 사원의 모든 정보를 SALESMAN TABLE로 복사
+
+SELECT * FROM SALESMAN;
+
+INSERT INTO SALESMAN
+SELECT * FROM PERSONNEL
+WHERE JOB = 'SALESMAN';
+
+COMMIT;--밑에 AUTO COMMIT 기능이 있다.
+
+--UPDATE
+--사원번호가 1111인 사원의 부서를 30으로 수정
+SELECT* FROM PERSONNEL WHERE PNO = 1111;
+UPDATE PERSONNEL SET DNO = 30--여기까지 하면 모든 데이터가 DNO가 다 30으로 바뀜
+WHERE PNO = 1111;
+
+UPDATE PERSONNEL SET JOB = 'SALESMAN', MANAGER = 1111,
+STARTDATE = SYSDATE, BONUS = 200 WHERE PNO = 7711;
+
+SELECT * FROM PERSONNEL;
+
+COMMIT;--반드시 수정 후 SAVE하기
+
+SELECT * FROM SAWON;
+
+UPDATE SAWON SET DNO = 20;
+
+ROLLBACK; 
+
+--SUB-QUERY로 수정
+
+SELECT DNO FROM DIVISION WHERE DNAME = 'SALES';--30
+
+SELECT * FROM PERSONNEL
+WHERE DNO = (SELECT DNO FROM DIVISION WHERE DNAME = 'SALES');
+
+UPDATE PERSONNEL SET JOB = 'SALESMAN'
+WHERE DNO = (SELECT DNO FROM DIVISION WHERE DNAME = 'SALES');
+
+SELECT * FROM PERSONNEL;
+SELECT * FROM DIVISION;
+
+--JOIN
+
+SELECT A.*
+FROM PERSONNEL A INNER JOIN DIVISION B
+ON A.DNO = B.DNO
+AND DNAME = 'SALES';
+
+SELECT A.*
+FROM PERSONNEL A, DIVISION B
+WHERE A.DNO = B.DNO
+AND DNAME = 'SALES';
+
+UPDATE PERSONNEL SET JOB = 'SALESMAN'
+FROM PERSONNEL A, DIVISION B
+WHERE A.DNO = B.DNO
+AND DNAME = 'SALES';--오라클에서 안?. MS-SQL에서는 ?
+
+COMMIT;
+
+--DELETE
+--사원번호가 1300인 사원 삭제
+
+SELECT * FROM PERSONNEL WHERE PNO = 1300;
+
+DELETE FROM PERSONNEL WHERE PNO = 1300;
+--FROM은 오라클, MS-SQL 둘다 생략 가능
+
+SELECT * FROM SAWON;
+
+DELETE SAWON;
+
+ROLLBACK;
+
+COMMIT;
+--부서명이 BUSAN인 부서의 부서번호를 찾아 그 부서에 해당하는 직원 삭제
+
+SELECT * FROM PERSONNEL
+WHERE DNO = (SELECT DNO FROM DIVISION WHERE POSITION = 'BUSAN');
+
+DELETE PERSONNEL
+WHERE DNO = (SELECT DNO FROM DIVISION WHERE POSITION = 'BUSAN');
+
+COMMIT;
+
+--DML 문장 실행시 오류남
+--INSERT ERROR
+
+SELECT* FROM PERSONNEL;
+DESC PERSONNEL;
+
+INSERT INTO PERSONNEL (PNO, PNAME, DNO) VALUES(1300, 'SONG', 99);--X
+--unique constraint 제약조건 때문에 현재는 오류남
+--PK (PRIMARY KEY) = 절대 중복값 허용x. NULL 허용 X. 반드시 값 입력.
+--TABLE당 1개의 COLUMN 생성가능. 다른 컬럼에는 못넣음. 1개의 컬럼만 가능
+
+SELECT * FROM USER_CONSTRAINTS;--제약조건만 저장한 테이블
+
+--UPDATE ERROR
+SELECT * FROM DIVISION;
+SELECT * FROM PERSONNEL;
+--PERSONNEL_DNO_FK - FOREIGN KEY
+
+UPDATE PERSONNEL SET DNO = 90;--DNO에 90없으므로 제약조건 ERROR.
+
+--DELETE ERROR
+DELETE DIVISION WHERE DNO = 30;--고아 데이터
+--PERSONNEL과 DIVISION에서 동시에 사용하고 있는 데이터를 삭제하려고 해서
+--ERROR남
+
+COMMIT;
+
+--TRANSACTION LOG
+--EX) A계좌에서 B계좌로 5000원 송금
+/*
+1. A계좌 있는지 여부 확인
+2. A계좌 잔액 확인(10000원)
+3. A계좌에서 5000원 차감 (잔액 5000원 기록)
+4. B계좌 확인
+5. B계좌로 5000원 송금 --여기서 끊어지면 
+6. B계좌 잔액 확인(6000원)
+7. B계좌 5000원 증감(잔액 11000원)
+8. 작업 끝 --COMMIT;
+*/
+ 
+ --UNDO1.LOG
+-- 3초전 마다 LOG파일 사용안해도 저장함
+--INSERT, UPDATE, DELETE 명령 중 실행 되었을 때 TRANSATION 시작
+--데이터를 잘 들어가면 COMMIT, 수정해야되면 ROLLBACK으로 하고 COMMIT
+--3개가 들어갔을 때만 TRANSATION
+
+--TRANSACTION LOCK
+
+--2022-09-10 FLIGHT TICKET 구매
+
+--TCL(TRANSACTION CONTROL LANGUAGE)
+--COMMIT, ROLLBACK, SAVEPOINT = CHECKPOINT
+
+
+
+--AUTO COMMIT-
+--DDL(CREATE, ALTER, DROP, RENAME)->무조건 AUTO COMMIT
+--DCL(GRANT, REVOKE) GRANT 권한 주기. REVOKE 권한 취소
+
+SELECT * FROM TAB;
+SELECT * FROM DIVISION;
+
+--DDL(CREATE, ALTER, DROP, RENAME)
+--OBJECT : TABLE, INDEX, SYNONYM, SEQUENCE, VIEW
+
+--TABLE : DATA TYPE이 먼저 있어야?
+/*
+CHAR : 문자(고정길이)
+VARCHAR2 : 문자(가변길이)
+VARCHAR -없어지고 지금은 VARCHAR2를 씀
+NUMBER(P, S) : 숫자
+DATE : 날짜(고정 길이)
+LONG : 문자(가변 길이, 2GB) --잘안씀
+*/
+
+/*
+5자리 공간에 4자리만 입력 했을 경우
+
+CHAR(5) - 남은 1자리 공간이 그대로 있어 필요없는 공간 낭비 상태.
+		- 데이터 처리 속도 빠름.(읽는 속도 빠름)
+		- 이름, 우편번호 처럼 사이즈가 정해진 데이터 일 때 사용
+		
+VARCHAR(5) - 남은 1자리가 메모리OS에 반환시켜서 남지 않고
+필요할 때 다시 달라고 해서 사용가능(불필요한 공간 낭비 안함)
+		   - 각각의 데이터가 저장된 공간의 사이즈가 정해져 있지 않아
+		   HEADER 읽고 데이터를 읽기 때문에 속도 느림.
+		   - 주소같은 데이터 일 때 사용
+		   - A A A A A B AB출력시 빈 메모리에 B로 추가하지만 
+		   번거롭기에 '단편화' 작업 필요
+*/
+
+SELECT * FROM PERSONNEL WHERE PNO = 1111;
+--일반적으로 PNO를 CHAR로 만듦 -> 읽는 소리 빨라서
+
+CREATE TABLE BUSEO1--항상 ()가로로 시작함
+(DNO NUMBER(2), --99까지만 들어감 2자리수라서
+DNAME VARCHAR(14),
+ZIPCODE CHAR(7));
+
+SELECT * FROM BUSEO1;
+DESC BUSEO1;
+
+INSERT INTO BUSEO1 VALUES(10, 'AAA', '123-123');
+
+INSERT INTO BUSEO1 VALUES(20, 'BBB', '222-333');
+
+/*
+1.영문자 시작(30자)
+2.영문자,숫자 사용가능(공백허용안함)
+3.특수문자는 _,$,#만 사용가능
+4.이름은 중복허용안함
+5.컬럼명이 틀려야함
+6.예약어 사용못함-여기서 쓰는 문법 안? SELECT, VALUES같은 걸로 이름 못씀
+
+--사용가능한 이름
+Sawon,P_NO,Division10,Name_Rule--시작은 영문자
+
+--사용불가능한 이름
+10division, $sal, p-no, Alter--시작은 영문자, ALTER 예약어
+
+*/
+
+CREATE TABLE CUSTOM
+(ID CHAR(5) PRIMARY KEY,
+PWD CHAR(3),
+NAME CHAR(6),
+ADDR VARCHAR2(50),
+ZIP CHAR(5),
+BIRTH DATE,
+JUMIN CHAR(14),
+AGE NUMBER,--숫자를 안쓰면 쓰고 싶은 만큼= 무한
+TEL CHAR (14));
+
+DESC CUSTOM;
+
+INSERT INTO CUSTOM
+VALUES('A001', '123', 'SUZI', '서울', '12345','94-10-10', '941010-2123456', 29, '010-1234-5656');
+
+SELECT * FROM CUSTOM;
+
+INSERT INTO CUSTOM
+VALUES(NULL, '123', 'INNA', '서울', '12345','94-10-10', '941010-2123456', 29, '010-1234-5656');
+
+INSERT INTO CUSTOM
+VALUES('A001', '123', 'INA', '서울', '12345',SYSDATE, '941010-2123456', 29, '010-1234-5656');
+
+DROP TABLE CUSTOM;
+
+SELECT * FROM USER_CONSTRAINTS;--DICTIONARY
+--PK 이름 회사마다 다르고 내가 직접 지정할 수 있고
+--오라클 보고 만들라고 할 수도 있음.
+--DIVISION_DNO_PK PRIMARY KEY 이런식으로 만들고
+--이름_PK 형식으로 만들어주면 보기 쉽다
+
+DROP TABLE CUSTOM;
+
+SELECT * FROM CUSTOM;
+
+SELECT * FROM USER_CONSTRAINTS;
+
+CREATE TABLE CUSTOM
+(ID CHAR(5) CONSTRAINT CUSTOM_ID_PK PRIMARY KEY,
+PWD CHAR(3),
+NAME CHAR(6),
+ADDR VARCHAR2(50),
+ZIP CHAR(5),
+BIRTH DATE,
+JUMIN CHAR(14),
+AGE NUMBER,--숫자를 안쓰면 쓰고 싶은 만큼= 무한
+TEL CHAR (14));
+
+DESC CUSTOM;
+COMMIT;
